@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blog.Entity.ViewModels.Categories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,11 @@ namespace Blog.Entity.ViewModels.Articles
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
+        public CategoryViewModel Category { get; set; }
         public string Content { get; set; }
-        public int ViewCount { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreatedBy { get; set; }
+        public bool IsDeleted { get; set; }
+        public List<CategoryViewModel> Categories { get; set; }
     }
 }
