@@ -27,5 +27,18 @@ namespace Blog.Service.Services.Concrete
             var map=mapper.Map<List<CategoryViewModel>>(categories);
             return map;
         }
+
+        public async Task CreateCategoryAsync(CategoryAddViewModel categoryAddViewModel)
+        {
+            var category = new Category
+            {
+                Name = categoryAddViewModel.Name,
+            };
+
+            await unitOfWork.GetRepository<Category>().AddAsync(category);
+            await unitOfWork.SaveAsync();
+        }
+
+
     }
 }

@@ -2,8 +2,12 @@
 using Blog.Entity.Entities;
 using Blog.Entity.ViewModels.Articles;
 using Blog.Service.Services.Abstraction;
+using Blog.Service.Services.Concrete;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
 
 namespace Blog.Web.Controllers
 {
@@ -12,34 +16,40 @@ namespace Blog.Web.Controllers
         private readonly IArticleService articleService;
         private readonly ICategoryService categoryService;
         private readonly IMapper mapper;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ArticleController(IArticleService articleService, ICategoryService categoryService, IMapper mapper)
+        public ArticleController(IArticleService articleService, ICategoryService categoryService, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             this.articleService = articleService;
             this.categoryService = categoryService;
             this.mapper = mapper;
+            this.webHostEnvironment = webHostEnvironment;
         }
+
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var articles = await articleService.GetAllArticleWithCategoryNonDeletedAsync();
-            return View(articles);
-        }
-        //[HttpGet]
-        //public async Task<IActionResult> Add()
-        //{
-        //    var categories = await categoryService.GetAllCategoriesNonDeleted();
-        //    return View(new ArticleAddViewModel { Categories = categories });
-        //}
+			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        //[HttpPost]
-        //public async Task<IActionResult> Add(ArticleAddViewModel articleAddViewModel)
-        //{
-        //    await articleService.CreateArticleAsync(articleAddViewModel);
-        //    RedirectToAction("Index", "Home", new { Area = "Admin" });
+			if (string.IsNullOrEmpty(userId))
+			{
+				// Kullanıcı oturum açmamışsa veya NameIdentifier talebi yoksa
+				return RedirectToAction("Login", "Auth"); // Doğru login sayfasına yönlendirin
+			}
 
-        //    var categories = await categoryService.GetAllCategoriesNonDeleted();
-        //    return View(new ArticleAddViewModel { Categories = categories });
-        //}
+			Guid userGuid;
+			if (!Guid.TryParse(userId, out userGuid))
+			{
+				// Kullanıcı oturum açmamışsa veya NameIdentifier talebi yoksa
+				return RedirectToAction("Login", "Auth"); // Doğru login sayfasına yönlendirin
+			}
+
+			var userArticles = await articleService.GetUserArticlesAsync(userGuid);
+			return View(userArticles);
+		}
+
+
+     
 
         [HttpGet]
         public async Task<IActionResult> Add()
@@ -49,7 +59,8 @@ namespace Blog.Web.Controllers
                 var categories = await categoryService.GetAllCategoriesNonDeleted();
                 var viewModel = new ArticleAddViewModel
                 {
-                    Categories = categories
+                    Categories = categories,
+               
                 };
                 return View(viewModel);
             }
@@ -64,27 +75,37 @@ namespace Blog.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(ArticleAddViewModel articleAddViewModel)
         {
-
-            var article = new ArticleAddViewModel
+            if (User.Identity.IsAuthenticated)
             {
-                Title = articleAddViewModel.Title,
-                Content = articleAddViewModel.Content,
-                CategoryId = articleAddViewModel.CategoryId,
-                Status = ArticleStatus.PendingApproval
-            };
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (Guid.TryParse(userId, out Guid userGuid))
+                {
+                    string createdBy = User.Identity.Name; // Kullanıcı adını buradan alıyoruz
 
-            await articleService.CreateArticleAsync(article);
+                    string uniqueFileName = null;
 
-            return RedirectToAction("Index", "Home");
+                    if (articleAddViewModel.Image != null)
+                    {
+                        string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                        uniqueFileName = Guid.NewGuid().ToString() + "_" + articleAddViewModel.Image.FileName;
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await articleAddViewModel.Image.CopyToAsync(fileStream);
+                        }
+                        articleAddViewModel.ImagePath = "/images/" + uniqueFileName;
+                    }
+
+                    await articleService.CreateArticleAsync(articleAddViewModel, userGuid, createdBy);
+                    return RedirectToAction("Index", "Article");
+                }
+            }
+
+            return RedirectToAction("Login", "Auth");
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Waiting()
-        //{
 
-        //    var articles = await articleService.GetAllArticleWithCategoryNonDeletedAsync();
-        //    return View(articles);
-        //}
+
 
         [HttpGet]
         public async Task<IActionResult> Update(Guid articleId)
@@ -112,11 +133,15 @@ namespace Blog.Web.Controllers
             return RedirectToAction("Index", "Article");
         }
 
+        [HttpPost]
         public async Task<IActionResult> Delete(Guid articleId)
         {
             await articleService.SafeDeleteArticleAsync(articleId);
 
-            return RedirectToAction("Index", "Article");
+            return Json(new { success = true });
         }
+
+      
+
     }
 }

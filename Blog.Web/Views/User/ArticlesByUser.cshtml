@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Blog.Entity.Entities;
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+
+@{
+    var userId = UserManager.GetUserId(User);
+    var user = await UserManager.FindByIdAsync(userId);
+}
+
+@model List<ArticleViewModel>
+
+
+<div class="container">
+    <h1>@Model.FirstOrDefault()?.CreatedBy's Articles</h1>
+    <div class="row">
+        @foreach (var article in Model)
+        {
+            <div class="col-lg-6">
+                <div class="card text-center mb-5">
+                    <div class="card-header p-0">
+                        <div class="blog-media">
+                            <img src="@article.ImagePath" alt="" class="w-100">
+                            <a href="#" class="badge badge-primary">#Placeat</a>
+                        </div>
+                    </div>
+                    <div class="card-body px-0">
+                        <h5 class="card-title mb-2">@article.Title</h5>
+                        <small class="small text-muted">
+                            @article.CreateDate
+                            <span class="px-2">-</span>
+                            <a href="#" class="text-muted">34 Comments</a>
+                        </small>
+                        <p class="my-2">@article.Content</p>
+                    </div>
+                    <div class="card-footer p-0 text-center">
+                        <a href="single-post.html" class="btn btn-outline-dark btn-sm">READ MORE</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -10,5 +10,6 @@ namespace Blog.Service.Services.Abstraction
     public interface ICategoryService
     {
         public Task<List<CategoryViewModel>> GetAllCategoriesNonDeleted();
+        Task CreateCategoryAsync(CategoryAddViewModel categoryAddViewModel);
     }
 }

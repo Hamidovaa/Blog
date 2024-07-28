@@ -30,6 +30,7 @@ namespace Blog.Entity.Entities
         public Guid  UserId { get; set; }
         public AppUser User { get; set; }
         public ArticleStatus? Status { get; set; }
+        public string ImagePath { get; set; }
     }
 }
 

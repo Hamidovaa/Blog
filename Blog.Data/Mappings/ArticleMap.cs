@@ -29,6 +29,7 @@ namespace Blog.Data.Mappings
                 CreateDate = DateTime.Now,
                 IsDeleted = false,
                 UserId= Guid.Parse("5D5A55F1-FE1C-4A59-B737-6A6DBFF724E1"),
+                ImagePath = "/images/ArticleContentPhoto/"
             },
             new Article
             {
@@ -41,6 +42,7 @@ namespace Blog.Data.Mappings
                 CreatedBy = "Admin",
                 CreateDate = DateTime.Now,
                 UserId= Guid.Parse("A05E2229-AE92-4A3F-A889-75C00FC64BF3"),
+                ImagePath = "/images/ArticleContentPhoto/"
             }
             );
             

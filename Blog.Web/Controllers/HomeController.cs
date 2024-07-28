@@ -1,4 +1,5 @@
 ﻿using Blog.Service.Services.Abstraction;
+using Blog.Service.Services.Concrete;
 using Blog.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -18,7 +19,7 @@ namespace Blog.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var articles = await articleService.GetAllApprovedArticlesAsync();
+            var articles = await articleService.GetAllNonDeletedApprovedArticlesAsync();
             return View(articles);
         }
 

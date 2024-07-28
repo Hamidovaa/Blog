@@ -1,12 +1,18 @@
-﻿@model List<ArticleViewModel>
+﻿@using Microsoft.AspNetCore.Identity
+@using Blog.Entity.Entities;
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+
+@{
+    var userId = UserManager.GetUserId(User);
+    var user = await UserManager.FindByIdAsync(userId);
+}
+
+@model List<ArticleViewModel>
 @{
     ViewData["Title"] = "Home Page";
 }
-
-
-
-
-
 
 
 
@@ -58,7 +64,7 @@
                 <div class="card-footer d-flex justify-content-between align-items-center flex-basis-0">
                     <button class="btn btn-primary circle-35 mr-4"><i class="ti-back-right"></i></button>
                     <a href="single-post.html" class="btn btn-outline-dark btn-sm">READ MORE</a>
-                    <a href="#" class="text-dark small text-muted">By : Joe Mitchell</a>
+                    
                 </div>
             </div>
             <hr>
@@ -69,13 +75,15 @@
                         <div class="card text-center mb-5">
                             <div class="card-header p-0">
                                 <div class="blog-media">
-                                    <img src="~/Dblog/public_html/assets/imgs/blog-2.jpg" alt="" class="w-100">
+                                    <img src="@articles.ImagePath" alt="" class="w-100">
                                     <a href="#" class="badge badge-primary">#Placeat</a>
                                 </div>
                             </div>
                             <div class="card-body px-0">
                                 <h5 class="card-title mb-2">@articles.Title</h5>
-                                <a href="#" class="text-dark small text-muted">@articles.CreatedBy</a>
+
+                                <a href="@Url.Action("ArticlesByUser", "Article", new { id = userId })">By : @articles.CreatedBy</a>
+                                <br />
                                 <small class="small text-muted">
                                     @articles.CreateDate
                                     <span class="px-2">-</span>

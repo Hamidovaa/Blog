@@ -19,5 +19,14 @@ namespace Blog.Entity.ViewModels.Articles
         public bool IsDeleted { get; set; }
         public List<CategoryViewModel> Categories { get; set; }
         public ArticleStatus? Status { get; set; }
+
+
+        public Guid UserId { get; set; }
+
+        // Kullanıcı bilgileri
+        public string Username { get; set; }
+        public string UserEmail { get; set; }
+        public string ImagePath { get; set; }
+
     }
 }

@@ -13,12 +13,25 @@ namespace Blog.Service.Services.Abstraction
     {
         Task<List<ArticleViewModel>> GetAllArticleWithCategoryNonDeletedAsync();
         Task<ArticleViewModel> GetArticleWithCategoryNonDeletedAsync(Guid articleId);
-        Task CreateArticleAsync(ArticleAddViewModel articleAddViewModel);
+        Task CreateArticleAsync(ArticleAddViewModel articleAddViewModel, Guid userId, string createdBy);
+
+
         Task<List<ArticleViewModel>> GetAllPendingArticlesAsync();
         Task ApproveArticleAsync(Guid articleId);
         Task RejectArticleAsync(Guid articleId);
         Task<List<ArticleViewModel>> GetAllApprovedArticlesAsync();
         Task UpdateArticleAsync(ArticleUpdateViewModel articleUpdateViewModel);
         Task SafeDeleteArticleAsync(Guid articleId);
+        Task<List<ArticleViewModel>> GetUserArticlesAsync(Guid userId);
+        Task<List<ArticleViewModel>> GetAllNonDeletedApprovedArticlesAsync();
+
+
+        Task<List<ArticleViewModel>> GetArticlesByUserIdAsync(Guid id);
+        Task<List<ArticleViewModel>> GetArticlesByUserAsync(Guid id);
+        Task CreateArticleAsync(ArticleAddViewModel articleAddViewModel, Guid guid);
+
+        Task<Guid?> GetUserIdByUsernameAsync(string username);
+
+        Task<IEnumerable<Article>> GetAllArticlesAsync();
     }
 }
