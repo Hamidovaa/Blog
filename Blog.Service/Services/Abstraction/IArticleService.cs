@@ -12,11 +12,13 @@ namespace Blog.Service.Services.Abstraction
     public interface IArticleService
     {
         Task<List<ArticleViewModel>> GetAllArticleWithCategoryNonDeletedAsync();
-
+        Task<ArticleViewModel> GetArticleWithCategoryNonDeletedAsync(Guid articleId);
         Task CreateArticleAsync(ArticleAddViewModel articleAddViewModel);
         Task<List<ArticleViewModel>> GetAllPendingArticlesAsync();
         Task ApproveArticleAsync(Guid articleId);
         Task RejectArticleAsync(Guid articleId);
         Task<List<ArticleViewModel>> GetAllApprovedArticlesAsync();
+        Task UpdateArticleAsync(ArticleUpdateViewModel articleUpdateViewModel);
+        Task SafeDeleteArticleAsync(Guid articleId);
     }
 }

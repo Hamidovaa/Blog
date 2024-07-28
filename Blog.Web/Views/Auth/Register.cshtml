@@ -1,0 +1,56 @@
+﻿@model UserRegisterViewModel;
+
+
+<container>
+    <row>
+        <div class="container col-sm-6 col-md-6 col-lg-4" style="width:50%; margin:auto; padding:10px 30px; margin-top:50px; border:2px solid #008080; border-radius:20px">
+            <div class="row">
+                <h2 style="margin:auto; color:#008080; padding-bottom:30px">Register </h2>
+            </div>
+            <form asp-action="Register" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FirstName"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ProfileImage"></label>
+                    <input asp-for="ProfileImage" type="file" class="form-control" />
+                    <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                </div>
+                <p style="text-align:center">Have you any account? <a style="color:#008080" asp-controller="Auth" asp-action="Login">Login</a></p>
+                <div style="text-align:center">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+
+            </form>
+        </div>
+    </row>
+</container>
+
+
+
+
+
+

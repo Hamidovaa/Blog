@@ -62,6 +62,13 @@ namespace Blog.Web.Areas.Admin.Controllers
             return RedirectToAction("PendingApproval");
         }
 
+        public async Task<IActionResult> Delete(Guid articleId)
+        {
+            await articleService.SafeDeleteArticleAsync(articleId);
+
+            return RedirectToAction("Index", "Article");
+        }
+
 
     }
 }

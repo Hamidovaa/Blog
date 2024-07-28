@@ -1,6 +1,8 @@
-﻿using Blog.Entity.Entities;
+﻿using AutoMapper;
+using Blog.Entity.Entities;
 using Blog.Entity.ViewModels.Articles;
 using Blog.Service.Services.Abstraction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Web.Controllers
@@ -9,11 +11,13 @@ namespace Blog.Web.Controllers
     {
         private readonly IArticleService articleService;
         private readonly ICategoryService categoryService;
+        private readonly IMapper mapper;
 
-        public ArticleController(IArticleService articleService, ICategoryService categoryService)
+        public ArticleController(IArticleService articleService, ICategoryService categoryService, IMapper mapper)
         {
             this.articleService = articleService;
             this.categoryService = categoryService;
+            this.mapper = mapper;
         }
         public async Task<IActionResult> Index()
         {
@@ -40,12 +44,21 @@ namespace Blog.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Add()
         {
-            var categories = await categoryService.GetAllCategoriesNonDeleted();
-            var viewModel = new ArticleAddViewModel
+            if (User.Identity.IsAuthenticated)
             {
-                Categories = categories
-            };
-            return View(viewModel);
+                var categories = await categoryService.GetAllCategoriesNonDeleted();
+                var viewModel = new ArticleAddViewModel
+                {
+                    Categories = categories
+                };
+                return View(viewModel);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+          
         }
 
         [HttpPost]
@@ -62,8 +75,48 @@ namespace Blog.Web.Controllers
 
             await articleService.CreateArticleAsync(article);
 
-            // Kullanıcıyı ana sayfaya yönlendirin
             return RedirectToAction("Index", "Home");
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> Waiting()
+        //{
+
+        //    var articles = await articleService.GetAllArticleWithCategoryNonDeletedAsync();
+        //    return View(articles);
+        //}
+
+        [HttpGet]
+        public async Task<IActionResult> Update(Guid articleId)
+        {
+            var article=await articleService.GetArticleWithCategoryNonDeletedAsync(articleId);
+            var categories= await categoryService.GetAllCategoriesNonDeleted();
+
+            var articleUpdateViewModel=mapper.Map<ArticleUpdateViewModel>(article);
+
+            articleUpdateViewModel.Categories=categories;
+
+            return View(articleUpdateViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(ArticleUpdateViewModel articleUpdateViewModel)
+        {
+            await articleService.UpdateArticleAsync(articleUpdateViewModel);
+
+            var categories = await categoryService.GetAllCategoriesNonDeleted();
+
+
+            articleUpdateViewModel.Categories = categories;
+
+            return RedirectToAction("Index", "Article");
+        }
+
+        public async Task<IActionResult> Delete(Guid articleId)
+        {
+            await articleService.SafeDeleteArticleAsync(articleId);
+
+            return RedirectToAction("Index", "Article");
         }
     }
 }

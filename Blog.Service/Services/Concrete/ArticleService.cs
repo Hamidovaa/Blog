@@ -84,6 +84,37 @@ namespace Blog.Service.Services.Concrete
             }
         }
 
-       
+        public async Task<ArticleViewModel> GetArticleWithCategoryNonDeletedAsync(Guid articleId)
+        {
+            var article = await _unitOfWork.GetRepository<Article>().GetAsync(x => !x.IsDeleted && x.Id==articleId, x => x.Category);
+            var map = mapper.Map<ArticleViewModel>(article);
+            return map;
+        }
+
+        public async Task UpdateArticleAsync(ArticleUpdateViewModel articleUpdateViewModel)
+        {
+            var article= await _unitOfWork.GetRepository<Article>().GetAsync(x=>!x.IsDeleted && x.Id==articleUpdateViewModel.Id, x=>x.Category);
+
+            article.Title= articleUpdateViewModel.Title;
+            article.Content= articleUpdateViewModel.Content;
+            article.CategoryId= articleUpdateViewModel.CategoryId;
+
+            await _unitOfWork.GetRepository<Article>().UpdateAsync(article);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task SafeDeleteArticleAsync(Guid articleId)
+        {
+            var article=await _unitOfWork.GetRepository<Article>().GetByGuidAsync(articleId);
+
+            article.IsDeleted = true;
+            article.DeletedDate=DateTime.Now;
+
+            await _unitOfWork .GetRepository<Article >().UpdateAsync(article);
+            await _unitOfWork .SaveAsync();
+        }
+
+
+
     }
 }
