@@ -101,7 +101,7 @@ namespace Blog.Web.Controllers
         }
 
 
-        [AllowAnonymous]
+        
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginViewModel userLoginViewModel)
         {
